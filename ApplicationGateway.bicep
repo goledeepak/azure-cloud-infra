@@ -23,85 +23,112 @@ resource pubSubNet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existi
 resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' = {
   name: 'appGateWay'
   location: location
+  zones: [
+    '1'
+    '2'
+  ]
   properties: {
+    
     sku: {
       capacity: 1      
       name: 'Standard_v2'
       tier: 'Standard_v2'
     }
-  gatewayIPConfigurations: [
-    {
-      name: 'appGatewayIpConfig'
-      properties: {
-        subnet: {
-          id: pubSubNet.id
-        }
-      }
-    }
-  ]
 
-  frontendIPConfigurations: [
-    {
-      name: 'appGwPublicFrontendIpIPv4'
-      properties: {
-        publicIPAddress: {
-          id: publicIPAddress.id
+    gatewayIPConfigurations: [
+      {
+        name: 'appGatewayIpConfig'
+        properties: {
+          subnet: {
+            id: pubSubNet.id
+          }
         }
       }
-    }
-  ]
+    ]
+
+    frontendIPConfigurations: [
+      {
+        name: 'appGwPublicFrontendIpIPv4'
+        properties: {
+          publicIPAddress: {
+            id: publicIPAddress.id
+          }
+        }
+      }
+    ]
   
-  frontendPorts: [
-    {
-      name: 'port_80'
-      properties:{
-        port: 80
+    frontendPorts: [    
+      {
+        name: 'port_80'
+        properties:{
+          port: 80
+        }
       }
-    }
-  ]
+    ]
   
-  backendAddressPools: [
-    {
-      name: 'VMPools'
-      properties: {
-        backendAddresses: [
-                  
-        ]
-      }
-    }
-  ]
-
-  backendHttpSettingsCollection: [
-    {
-      name: 'HTTP80BackendSettings'
-      properties: {
-        port: 80
-        protocol: 'Http'
-        cookieBasedAffinity: 'Disabled'
-        requestTimeout: 20
-      }
-    }
-  ]
-
-  httpListeners: [
-    {
-      name: 'Port80Listener'
-      properties: {
-        frontendIPConfiguration: {
-          id: applicationGatewayID
+    backendAddressPools: [
+      {
+        name: 'VMPools'
+        properties: {
+          backendAddresses: [
+            {          
+            }                   
+          ]
         }
-        frontendPort: {
-          id: resourceId('Microsoft.Network/applicationGateway/frontendPorts', 'appGateWay', 'port_80')
-        }
-        protocol: 'Http'
-        sslCertificate: null
-        customErrorConfigurations: []
       }
-    
-    }
-  ]
+    ]
+
+    backendHttpSettingsCollection: [
+      {
+        name: 'HTTP80BackendSettings'
+        properties: {
+          port: 80
+          protocol: 'Http'
+          cookieBasedAffinity: 'Disabled'
+          requestTimeout: 20          
+        }
+      }
+    ]
+
+    httpListeners: [
+      {
+        name: 'Port80Listener'
+        properties: {
+          frontendIPConfiguration: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', 'appGateWay', 'appGwPublicFrontendIpIPv4')
+          }
+          frontendPort: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', 'appGateWay', 'port_80')
+          }
+          protocol: 'Http'
+          sslCertificate: null
+          customErrorConfigurations: []
+        }
+      
+      }
+    ]
+
+    requestRoutingRules: [
+      {
+        name: 'Port80Rule'
+        properties: {
+          ruleType: 'Basic'
+          httpListener: {
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', 'appGateWay', 'Port80Listener')
+          }
+          priority: 1
+          backendAddressPool: {
+            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', 'appGateWay', 'VMPools')
+          }
+          backendHttpSettings: {
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', 'appGateWay', 'HTTP80BackendSettings')
+          }
+        }
+      }
+    ]
 
   }
 }
 
-output frontendPort string = resourceId('Microsoft.Network/applicationGateway/frontendPorts', 'appGateWay', 'port_80')
+output appGateway string = resourceId('Microsoft.Network/applicationGateway', 'appGateWay')
+
