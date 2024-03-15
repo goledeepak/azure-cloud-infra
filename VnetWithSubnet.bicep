@@ -107,32 +107,6 @@ resource securityGrpPrivate 'Microsoft.Network/networkSecurityGroups@2023-09-01'
   location: location
   properties:{
     securityRules:[
-      {
-        name: 'Allow-WEB-HTTP'
-        properties: {
-          priority: 200
-          access: 'Allow'
-          direction: 'Inbound'
-          destinationPortRange: '80'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-        }    
-      }      
-      {
-        name: 'Allow-WEB-HTTPS'
-        properties: {
-          priority: 300
-          access: 'Allow'
-          direction: 'Inbound'
-          destinationPortRange: '443'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-        }    
-      }
     ]
   }
 }
@@ -142,7 +116,6 @@ resource securityGrpSecure 'Microsoft.Network/networkSecurityGroups@2023-09-01' 
   location: location
   properties:{
     securityRules:[
-     
     ]
   }
 }

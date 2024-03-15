@@ -1,0 +1,14 @@
+https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-20-04
+sudo apt update
+sudo apt install apache2
+sudo systemctl start apache2
+sudo systemctl stop apache2
+
+
+
+systemctl enable --now cloud-init
+
+
+-------
+https://learn.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-automate-vm-deployment
+

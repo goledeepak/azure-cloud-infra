@@ -1,5 +1,5 @@
 param location string = 'centralindia'
-var applicationGatewayID = resourceId('Microsoft.Network/applicationGateway', 'appGateWay')
+//var applicationGatewayID = resourceId('Microsoft.Network/applicationGateway', 'appGateWay')
 
 
 resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2019-11-01' = {
@@ -11,14 +11,29 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2019-11-01' = {
   properties: {
     publicIPAllocationMethod: 'Static'
     dnsSettings: {
-      domainNameLabel: 'publicipforcloud'
+      domainNameLabel: 'deepakforcloud'
     }
   }
 }
 
-resource pubSubNet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
-  name: 'VNET-Devops/PublicSubnet'
+// resource pubSubNet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+//   name: 'VNET-Devops/PublicSubnet'
+// }
+
+resource securityGrpPublic 'Microsoft.Network/networkSecurityGroups@2023-04-01' existing = {
+  name: 'securityGrpPublic'
 }
+
+resource appGatwaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
+  name: 'VNET-Devops/appGatSubnet'
+  properties: {
+    addressPrefix: '10.0.1.0/26'    
+    networkSecurityGroup: {
+      id: securityGrpPublic.id  
+    }
+  }
+}
+
 
 resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' = {
   name: 'appGateWay'
@@ -40,7 +55,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' =
         name: 'appGatewayIpConfig'
         properties: {
           subnet: {
-            id: pubSubNet.id
+            id: appGatwaySubnet.id
           }
         }
       }
@@ -70,9 +85,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' =
       {
         name: 'VMPools'
         properties: {
-          backendAddresses: [
-            {          
-            }                   
+          backendAddresses: [                      
           ]
         }
       }
