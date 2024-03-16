@@ -24,7 +24,7 @@ resource securityGrpPublic 'Microsoft.Network/networkSecurityGroups@2023-04-01' 
   name: 'securityGrpPublic'
 }
 
-resource appGatwaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
+resource appGatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
   name: 'VNET-Devops/appGatSubnet'
   properties: {
     addressPrefix: '10.0.1.0/26'    
@@ -55,7 +55,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' =
         name: 'appGatewayIpConfig'
         properties: {
           subnet: {
-            id: appGatwaySubnet.id
+            id: appGatewaySubnet.id
           }
         }
       }
